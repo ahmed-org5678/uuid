@@ -58,6 +58,11 @@
     "standard-version": "9.5.0",
     "typescript": "5.4.3"
   },
+  "overrides": {
+    "bundlewatch": {
+      "axios": "0.33.0"
+    }
+  },
   "optionalDevDependencies": {
     "@wdio/browserstack-service": "9.27.0",
     "@wdio/cli": "9.27.0",
