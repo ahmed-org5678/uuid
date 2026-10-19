@@ -18,6 +18,10 @@ function usage() {
   console.log('  uuid v7');
   console.log('  uuid --help');
   console.log(
+    '\nOptions: --count <n> or -n <n> prints 1 to 10000 UUIDs for v1, v4, v6 or v7.',
+  );
+  console.log('  The count option may appear before or after the version.');
+  console.log(
     '\nNote: <namespace uuid> may be "URL" or "DNS" to use the corresponding UUIDs defined by RFC9562',
   );
 }
@@ -29,12 +33,49 @@ if (args.indexOf('--help') >= 0) {
   process.exit(0);
 }
 
+let count = 1;
+let hasCount = false;
+
+for (let i = 0; i < args.length; i++) {
+  if (args[i] !== '--count' && args[i] !== '-n') continue;
+
+  const value = args[i + 1];
+  if (
+    value === undefined ||
+    !/^\d+$/.test(value) ||
+    Number(value) < 1 ||
+    Number(value) > 10000
+  ) {
+    console.error(
+      `Invalid count ${JSON.stringify(value ?? '<missing>')}: expected a whole number from 1 to 10000`,
+    );
+    process.exit(1);
+  }
+
+  count = Number(value);
+  hasCount = true;
+  args.splice(i, 2);
+  i--;
+}
+
 const version = args.shift() || 'v4';
+
+if (hasCount && (version === 'v3' || version === 'v5')) {
+  console.error(`Count is not supported for ${version}`);
+  process.exit(1);
+}
 
 switch (version) {
   case 'v1':
-    console.log(v1());
+  case 'v4':
+  case 'v6':
+  case 'v7': {
+    const generate: () => string = { v1, v4, v6, v7 }[version];
+    for (let i = 0; i < count; i++) {
+      console.log(generate());
+    }
     break;
+  }
 
   case 'v3': {
     const name = args.shift();
@@ -55,10 +96,6 @@ switch (version) {
     break;
   }
 
-  case 'v4':
-    console.log(v4());
-    break;
-
   case 'v5': {
     const name = args.shift();
     let namespace = args.shift();
@@ -77,14 +114,6 @@ switch (version) {
     console.log(v5(name, namespace));
     break;
   }
-
-  case 'v6':
-    console.log(v6());
-    break;
-
-  case 'v7':
-    console.log(v7());
-    break;
 
   default:
     usage();
