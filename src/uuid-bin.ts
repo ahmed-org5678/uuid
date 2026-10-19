@@ -17,6 +17,7 @@ function usage() {
   console.log('  uuid v6');
   console.log('  uuid v7');
   console.log('  uuid --help');
+  console.log('  uuid -h');
   console.log(
     '\nNote: <namespace uuid> may be "URL" or "DNS" to use the corresponding UUIDs defined by RFC9562',
   );
@@ -24,7 +25,7 @@ function usage() {
 
 const args = process.argv.slice(2);
 
-if (args.indexOf('--help') >= 0) {
+if (args.indexOf('--help') >= 0 || args.indexOf('-h') >= 0) {
   usage();
   process.exit(0);
 }
