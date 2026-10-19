@@ -58,6 +58,17 @@
     "standard-version": "9.5.0",
     "typescript": "5.4.3"
   },
+  "overrides": {
+    "@xmldom/xmldom": "0.8.15",
+    "brace-expansion@1": "1.1.20",
+    "brace-expansion@2": "2.1.6",
+    "brace-expansion@5": "5.0.11",
+    "bundlewatch": {
+      "axios": "0.34.0"
+    },
+    "handlebars": "4.7.10",
+    "shell-quote": "1.11.0"
+  },
   "optionalDevDependencies": {
     "@wdio/browserstack-service": "9.27.0",
     "@wdio/cli": "9.27.0",
