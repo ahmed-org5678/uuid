@@ -9,14 +9,20 @@ import v7 from './v7.js';
 
 function usage() {
   console.log('Usage:');
-  console.log('  uuid');
-  console.log('  uuid v1');
+  console.log('  uuid [--count <n> | -n <n>]');
+  console.log('  uuid v1 [--count <n> | -n <n>]');
   console.log('  uuid v3 <name> <namespace uuid>');
-  console.log('  uuid v4');
+  console.log('  uuid v4 [--count <n> | -n <n>]');
   console.log('  uuid v5 <name> <namespace uuid>');
-  console.log('  uuid v6');
-  console.log('  uuid v7');
+  console.log('  uuid v6 [--count <n> | -n <n>]');
+  console.log('  uuid v7 [--count <n> | -n <n>]');
   console.log('  uuid --help');
+  console.log(
+    '\nCount: a whole number from 1 to 10000 (default: 1), before or after the version.',
+  );
+  console.log(
+    'Count is not supported for v3 or v5. v7 batches are strictly increasing.',
+  );
   console.log(
     '\nNote: <namespace uuid> may be "URL" or "DNS" to use the corresponding UUIDs defined by RFC9562',
   );
@@ -29,12 +35,53 @@ if (args.indexOf('--help') >= 0) {
   process.exit(0);
 }
 
+let count = 1;
+let hasCount = false;
+
+for (let i = 0; i < args.length; ) {
+  if (args[i] !== '--count' && args[i] !== '-n') {
+    i++;
+    continue;
+  }
+
+  const value = args[i + 1];
+  if (
+    !value ||
+    /[^0-9]/.test(value) ||
+    Number(value) < 1 ||
+    Number(value) > 10000
+  ) {
+    console.error(
+      `Invalid count ${value === undefined ? '<missing>' : JSON.stringify(value)}: expected a whole number from 1 to 10000`,
+    );
+    process.exit(1);
+  }
+
+  count = Number(value);
+  hasCount = true;
+  args.splice(i, 2);
+}
+
 const version = args.shift() || 'v4';
+
+if (hasCount && (version === 'v3' || version === 'v5')) {
+  console.error(
+    `Count is not supported for ${version}: it generates deterministic UUIDs`,
+  );
+  process.exit(1);
+}
 
 switch (version) {
   case 'v1':
-    console.log(v1());
+  case 'v4':
+  case 'v6':
+  case 'v7': {
+    const generate: () => string = { v1, v4, v6, v7 }[version];
+    for (let i = 0; i < count; i++) {
+      console.log(generate());
+    }
     break;
+  }
 
   case 'v3': {
     const name = args.shift();
@@ -55,10 +102,6 @@ switch (version) {
     break;
   }
 
-  case 'v4':
-    console.log(v4());
-    break;
-
   case 'v5': {
     const name = args.shift();
     let namespace = args.shift();
@@ -77,14 +120,6 @@ switch (version) {
     console.log(v5(name, namespace));
     break;
   }
-
-  case 'v6':
-    console.log(v6());
-    break;
-
-  case 'v7':
-    console.log(v7());
-    break;
 
   default:
     usage();

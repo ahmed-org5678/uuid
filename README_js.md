@@ -464,22 +464,25 @@ $ npx uuid
 ddeb27fb-d9a0-4624-be4d-4615062daed4
 ```
 
-The default is to generate version 4 UUIDS, however the other versions are supported. Type `uuid --help` for details:
+The default is to generate one version 4 UUID, however the other versions are supported. Use `--count <n>` or `-n <n>` to print a batch of 1 to 10000 UUIDs, one per line, for v1, v4, v6 or v7. The count option can appear before or after the version, for example `uuid -n 3 v7` or `uuid v7 --count 3`. Counts must contain only decimal digits; invalid or missing counts fail before printing any UUIDs. Counts are refused for deterministic v3 and v5 UUIDs. UUIDs in a v7 batch are strictly increasing. Type `uuid --help` for details:
 
 ```shell
 $ npx uuid --help
 
 Usage:
-  uuid
-  uuid v1
+  uuid [--count <n> | -n <n>]
+  uuid v1 [--count <n> | -n <n>]
   uuid v3 <name> <namespace uuid>
-  uuid v4
+  uuid v4 [--count <n> | -n <n>]
   uuid v5 <name> <namespace uuid>
-  uuid v7
+  uuid v6 [--count <n> | -n <n>]
+  uuid v7 [--count <n> | -n <n>]
   uuid --help
 
-Note: <namespace uuid> may be "URL" or "DNS" to use the corresponding UUIDs
-defined by RFC9562
+Count: a whole number from 1 to 10000 (default: 1), before or after the version.
+Count is not supported for v3 or v5. v7 batches are strictly increasing.
+
+Note: <namespace uuid> may be "URL" or "DNS" to use the corresponding UUIDs defined by RFC9562
 ```
 
 ## `options` Handling for Timestamp UUIDs
